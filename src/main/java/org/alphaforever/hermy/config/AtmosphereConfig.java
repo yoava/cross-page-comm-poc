@@ -1,4 +1,4 @@
-package org.aharoni.poc.iebridge.config;
+package org.alphaforever.hermy.config;
 
 import org.atmosphere.cpr.AtmosphereServlet;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -10,7 +10,7 @@ import org.springframework.core.Ordered;
 @Configuration
 @EnableAutoConfiguration
 public class AtmosphereConfig {
-    public static final String SOCKET_URL_PREFIX = "socket";
+    public static final String SOCKET_URL_PREFIX = "hermy/socket";
 
     @Bean
     public AtmosphereInitializer atmosphereInitializer() {

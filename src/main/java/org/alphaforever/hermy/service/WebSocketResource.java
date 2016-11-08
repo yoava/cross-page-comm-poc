@@ -1,4 +1,4 @@
-package org.aharoni.poc.iebridge;
+package org.alphaforever.hermy.service;
 
 import org.atmosphere.config.service.Disconnect;
 import org.atmosphere.config.service.ManagedService;
@@ -11,15 +11,15 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-import static org.aharoni.poc.iebridge.config.AtmosphereConfig.SOCKET_URL_PREFIX;
+import static org.alphaforever.hermy.config.AtmosphereConfig.SOCKET_URL_PREFIX;
 
 @ManagedService(path = "/" + SOCKET_URL_PREFIX + "/{id}")
-public class WebSocketService {
-    private static final Logger log = LoggerFactory.getLogger(WebSocketService.class);
+public class WebSocketResource {
+    private static final Logger log = LoggerFactory.getLogger(WebSocketResource.class);
 
     @Ready
     public void onReady(final AtmosphereResource resource) {
-        resource.getBroadcaster().broadcast("{\"message\":\"connect\"}");
+        resource.getBroadcaster().broadcast("{\"$type\":\"connected\"}");
         log.info("Connected", resource.uuid());
     }
 
@@ -30,7 +30,7 @@ public class WebSocketService {
 
     @Message
     public String onMessage(String message) throws IOException {
-        log.info("Author {} sent message {}", message);
+        log.debug("Message sent", message);
         return message;
     }
 }

@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.aharoni.poc.iebridge;
+package org.alphaforever.hermy;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.PropertyPlaceholderAutoConfiguration;
@@ -46,12 +46,11 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = AtmosphereApplication.class)
+@SpringApplicationConfiguration(classes = HermyServer.class)
 @WebIntegrationTest(randomPort = true)
 @DirtiesContext
-public class SampleAtmosphereApplicationTests {
-
-    private static Log logger = LogFactory.getLog(SampleAtmosphereApplicationTests.class);
+public class HermesApplicationTests {
+    private static Logger log = LoggerFactory.getLogger(HermesApplicationTests.class);
 
     @Value("${local.server.port}")
     private int port = 1234;
@@ -61,7 +60,7 @@ public class SampleAtmosphereApplicationTests {
         ConfigurableApplicationContext context = new SpringApplicationBuilder(
                 ClientConfiguration.class, PropertyPlaceholderAutoConfiguration.class)
                 .properties(
-                        "websocket.uri:ws://localhost:" + this.port + "/chat/websocket")
+                        "websocket.uri:ws://localhost:" + this.port + "/hermy")
                 .run("--spring.main.web_environment=false");
         long count = context.getBean(ClientConfiguration.class).latch.getCount();
         AtomicReference<String> messagePayloadReference = context
@@ -82,11 +81,11 @@ public class SampleAtmosphereApplicationTests {
 
         @Override
         public void run(String... args) throws Exception {
-            logger.info("Waiting for response: latch=" + this.latch.getCount());
+            log.info("Waiting for response: latch=" + this.latch.getCount());
             if (this.latch.await(10, TimeUnit.SECONDS)) {
-                logger.info("Got response: " + this.messagePayload.get());
+                log.info("Got response: " + this.messagePayload.get());
             } else {
-                logger.info("Response not received: latch=" + this.latch.getCount());
+                log.info("Response not received: latch=" + this.latch.getCount());
             }
         }
 
@@ -117,7 +116,7 @@ public class SampleAtmosphereApplicationTests {
                 @Override
                 protected void handleTextMessage(WebSocketSession session,
                                                  TextMessage message) throws Exception {
-                    logger.info("Received: " + message + " ("
+                    log.info("Received: " + message + " ("
                             + ClientConfiguration.this.latch.getCount() + ")");
                     session.close();
                     ClientConfiguration.this.messagePayload.set(message.getPayload());

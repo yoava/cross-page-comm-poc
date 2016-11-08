@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=5"/>
     <meta charset="utf-8">
     <title>Atmosphere Chat</title>
     <!-- Atmosphere -->
     <script type="text/javascript" src="webjars/atmosphere-javascript/2.3.2/atmosphere.js"></script>
     <!-- Application -->
-    <script type="text/javascript" src="lib/jquery-1.9.0.js"></script>
-    <script type="text/javascript" src="application.js"></script>
-    <link href="demo.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="../lib/jquery-1.9.0.js"></script>
+    <script type="text/javascript" src="../application.js"></script>
+    <link href="example.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <div id="header">
@@ -19,7 +20,9 @@
 <div>
     <span id="status">Connecting...</span>
     <input type="text" id="input" disabled="disabled"/>
-    <a href="javascript:;" onclick="openIE5();">===ie5===</a>
+    <script>
+        alert('loaded')
+    </script>
 </div>
 </body>
 </html>

@@ -1,4 +1,4 @@
-package org.aharoni.poc.iebridge.config;
+package org.alphaforever.hermy.config;
 
 import org.atmosphere.cpr.ContainerInitializer;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
