@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Hermy Example:: Legacy App</title>
+    <link href="example.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="/hermy/lib/jquery-1.9.0.js"></script>
+    <script type="text/javascript" src="/hermy/webjars/atmosphere-javascript/2.3.2/atmosphere.js"></script>
+    <script type="text/javascript" src="/hermy/lib/hermy-0.1.js"></script>
+    <script>
+        $(function () {
+            // create HermyClient
+            var channel = new HermyClient('yoava')   // use default config and 'yoava' as a tokenSeed
+                    .channel('legacy')               // get messages send to 'legacy'
+                    .with('angularjs');              // send messages to 'angularjs'
+
+            channel
+            // show Edit User dialog when receiving 'editUser' message
+                    .on('editUser', function (user) {
+                        $('#userDialog').toggleClass('hidden');
+                        $('#userId').html(user.id);
+                        $('#username')
+                        window.focus();
+                    })
+
+                    // log all messages
+                    .on(function (message, metadata) {
+                        console.info('Got message', message, metadata);
+
+                        var body = atmosphere.util.stringifyJSON(message);
+                        $('#messages').append(
+                                '<div class="message">' +
+                                '<span class="field">from</span>' +
+                                '<span class="value">' + metadata.$from + '</span>' +
+                                '<span class="field">type</span>' +
+                                '<span class="value">' + metadata.$type + '</span>' +
+                                '<span class="field">body</span>' +
+                                '<span class="value">' + body + '</span>' +
+                                '</div>')
+                    });
+
+
+            // send message back to angularjs when editing is done
+            $('#submitButton').click(function () {
+                channel.send('userChanged', {
+                    id: parseInt($('#userId').html()),
+                    name: $('#username').val()
+                });
+            })
+        });
+    </script>
+</head>
+<body>
+
+<h1>Legacy App</h1>
+
+<div id="userDialog" class="hidden">
+    <h3>Editing user #<span id="userId"></span></h3>
+    <label for="username">Username:</label><input id="username" type="text">
+    <button id="submitButton">Done</button>
+</div>
+
+<h3>Hermy Log:</h3>
+<div id="messages" class="log"></div>
+
+</body>
+</html>

@@ -1,15 +1,7 @@
 $(function () {
     "use strict";
 
-    var header = $('#header');
-    var content = $('#content');
-    var input = $('#input');
-    var status = $('#status');
-    var myName = false;
-    var author = null;
-    var logged = false;
-    var socket = atmosphere;
-    var subSocket;
+    var socket;
     // We are now ready to cut the request
     var request = {
         url: '/hermy/socket/aaa',
@@ -18,7 +10,7 @@ $(function () {
         logLevel: 'debug',
         transport: 'websocket',
         trackMessageLength: true,
-        reconnectInterval: 5000
+        reconnectInterval: 500
     };
 
     request.onOpen = function (response) {
@@ -41,7 +33,7 @@ $(function () {
                     text: 'Client closed the connection after a timeout. Reconnecting in '
                     + request.reconnectInterval
                 }));
-        subSocket
+        socket
             .push(atmosphere.util
                 .stringifyJSON({
                     author: author,
@@ -50,7 +42,7 @@ $(function () {
                 }));
         input.attr('disabled', 'disabled');
         setTimeout(function () {
-            subSocket = socket.subscribe(request);
+            socket = atmosphere.subscribe(request);
         }, request.reconnectInterval);
     };
 
@@ -105,8 +97,8 @@ $(function () {
         content.html($('<p>', {
             text: 'Server closed the connection after a timeout'
         }));
-        if (subSocket) {
-            subSocket.push(atmosphere.util.stringifyJSON({
+        if (socket) {
+            socket.push(atmosphere.util.stringifyJSON({
                 author: author,
                 message: 'disconnecting'
             }));
@@ -130,7 +122,7 @@ $(function () {
         input.attr('disabled', 'disabled');
     };
 
-    subSocket = socket.subscribe(request);
+    socket = atmosphere.subscribe(request);
 
     input.keydown(function (e) {
         if (e.keyCode === 13) {
@@ -141,7 +133,7 @@ $(function () {
                 author = msg;
             }
 
-            subSocket.push(atmosphere.util.stringifyJSON({
+            socket.push(atmosphere.util.stringifyJSON({
                 author: author,
                 message: msg
             }));
@@ -175,7 +167,7 @@ $(function () {
     var ie5win;
     window.openIE5 = function () {
         if (!ie5win || ie5win.closed) {
-            ie5win = window.open('example-ie7.html', 'ie5');
+            ie5win = window.open('example-legacy.html', 'ie5');
         } else {
             alert('already opened!')
         }

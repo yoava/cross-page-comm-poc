@@ -2,24 +2,65 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Atmosphere Chat</title>
-    <!-- Atmosphere -->
-    <script type="text/javascript" src="webjars/atmosphere-javascript/2.3.2/atmosphere.js"></script>
-    <!-- Application -->
-    <script type="text/javascript" src="../lib/jquery-1.9.0.js"></script>
-    <script type="text/javascript" src="../application.js"></script>
+    <title>Hermy Example:: AngularJS App</title>
     <link href="example.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="/hermy/lib/jquery-1.9.0.js"></script>
+    <script type="text/javascript" src="/hermy/webjars/atmosphere-javascript/2.3.2/atmosphere.js"></script>
+    <script type="text/javascript" src="/hermy/lib/hermy-0.1.js"></script>
+    <script type="text/javascript" src="/hermy/lib/angular-1.5.8.min.js"></script>
+    <script>
+        angular.module('ExampleApp', [])
+                .controller('ExampleController', function ($scope) {
+                    // init log
+                    $scope.log = [];
+
+                    var channel = new HermyClient('yoava')   // use default config and 'yoava' as a tokenSeed
+                            .channel('angularjs')            // get messages send to 'angularjs'
+                            .with('legacy');                 // send messages to 'legacy'
+
+                    channel
+                    // update model when user changes from legacy app
+                            .on('userChanged', function (user) {
+                                $scope.user = user;
+                                window.focus();
+                            })
+
+                            // log all messages
+                            .on(function (message, metadata) {
+                                console.info('Got message', message, metadata);
+                                $scope.log.push({body: message, metadata: metadata});
+                            });
+
+                    $scope.editUserInLegacyApp = function () {
+                        channel.send('editUser', $scope.user);
+                    }
+                });
+
+    </script>
 </head>
-<body>
-<div id="header">
-    <h3>Atmosphere Spring Boot Chat. Default transport is WebSocket, fallback is
-        long-polling</h3>
+<body ng-app="ExampleApp">
+
+<h1>AngularJS App</h1>
+
+<div ng-controller="ExampleController">
+
+    <div class="editUser">
+        <h3>Edit User in Legacy App</h3>
+        <div><label for="userId">Id:</label><input id="userId" type="text"></div>
+        <div><label for="username">Username:</label><input id="username" type="text"></div>
+        <button ng-click="editUserInLegacyApp()">Edit</button>
+    </div>
+
+    <h3>Hermy Log:</h3>
+    <div ng-repeat="message in log" class="log">
+        <span class="field">from</span>
+        <span class="value">{{message.metadata.$from}}</span>
+        <span class="field">type</span>
+        <span class="value">{{message.metadata.$type}}</span>
+        <span class="field">body</span>
+        <span class="value">{{message.body | json}}</span>
+    </div>
 </div>
-<div id="content"></div>
-<div>
-    <span id="status">Connecting...</span>
-    <input type="text" id="input" disabled="disabled"/>
-    <a href="javascript:;" onclick="openIE5();">===ie5===</a>
-</div>
+
 </body>
 </html>
