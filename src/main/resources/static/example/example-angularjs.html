@@ -13,6 +13,7 @@
                 .controller('ExampleController', function ($scope) {
                     // init log
                     $scope.log = [];
+                    $scope.user = {id: 1, name: 'Dude'};
 
                     var channel = new HermyClient('yoava')   // use default config and 'yoava' as a tokenSeed
                             .channel('angularjs')            // get messages send to 'angularjs'
@@ -23,16 +24,21 @@
                             .on('userChanged', function (user) {
                                 $scope.user = user;
                                 window.focus();
+                                $scope.$apply();
                             })
 
                             // log all messages
-                            .on(function (message, metadata) {
-                                console.info('Got message', message, metadata);
-                                $scope.log.push({body: message, metadata: metadata});
-                            });
+                            .on(logMessage)
+                            .on('$connected', 'angularjs', logMessage);
 
                     $scope.editUserInLegacyApp = function () {
                         channel.send('editUser', $scope.user);
+                        window.open('javascript:;', 'legacy');
+                    };
+
+                    function logMessage(message, metadata) {
+                        console.info('Got message', message, metadata);
+                        $scope.log.push({body: message, metadata: metadata});
                     }
                 });
 
@@ -46,12 +52,12 @@
 
     <div class="editUser">
         <h3>Edit User in Legacy App</h3>
-        <div><label for="userId">Id:</label><input id="userId" type="text"></div>
-        <div><label for="username">Username:</label><input id="username" type="text"></div>
-        <button ng-click="editUserInLegacyApp()">Edit</button>
+        <div><label for="userId">Id:</label><input id="userId" type="text" ng-model="user.id"></div>
+        <div><label for="username">Username:</label><input id="username" type="text" ng-model="user.name"></div>
+        <button ng-click="editUserInLegacyApp()">Edit in legacy app</button>
     </div>
 
-    <h3>Hermy Log:</h3>
+    <h3 class="title">Hermy Log:</h3>
     <div ng-repeat="message in log" class="log">
         <span class="field">from</span>
         <span class="value">{{message.metadata.$from}}</span>

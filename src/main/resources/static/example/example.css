@@ -1,0 +1,49 @@
+body {
+    font-size: 13px;
+    font-family: Arial, sans-serif;
+}
+
+h3 {
+    margin-top: 5px;
+}
+
+input {
+    margin-top: 10px;
+    margin-left: 10px;
+}
+
+label {
+    width: 80px;
+    display: inline-block;
+}
+
+.editUser {
+    border: outset 2px;
+    padding: 10px 20px;
+    display: inline-block;
+}
+
+.hidden {
+    display: none;
+}
+
+button {
+    margin-top: 20px;
+}
+
+.title {
+    margin-top: 20px;
+}
+
+.field {
+    font-weight: bold;
+    padding: 5px;
+}
+
+.field:after {
+    content: ":";
+}
+
+.value {
+    padding: 5px;
+}

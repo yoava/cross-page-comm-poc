@@ -1,9 +1,6 @@
 package org.alphaforever.hermy.service;
 
-import org.atmosphere.config.service.Disconnect;
-import org.atmosphere.config.service.ManagedService;
-import org.atmosphere.config.service.Message;
-import org.atmosphere.config.service.Ready;
+import org.atmosphere.config.service.*;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResourceEvent;
 import org.slf4j.Logger;
@@ -17,10 +14,13 @@ import static org.alphaforever.hermy.config.AtmosphereConfig.SOCKET_URL_PREFIX;
 public class WebSocketResource {
     private static final Logger log = LoggerFactory.getLogger(WebSocketResource.class);
 
+    @PathParam("id")
+    private String id;
+
     @Ready
     public void onReady(final AtmosphereResource resource) {
-        resource.getBroadcaster().broadcast("{\"$type\":\"connected\"}");
-        log.info("Connected", resource.uuid());
+        resource.getBroadcaster().broadcast("{\"$type\":\"$connected\",\"id\":\"" + id + "\"}");
+        log.info("Connected uuid={}, cid={}", resource.uuid(), id);
     }
 
     @Disconnect

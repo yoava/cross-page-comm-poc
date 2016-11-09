@@ -10,40 +10,35 @@ $(function () {
         logLevel: 'debug',
         transport: 'websocket',
         trackMessageLength: true,
-        reconnectInterval: 500
-    };
+        reconnectInterval: 500,
 
-    request.onOpen = function (response) {
-        content.html($('<p>', {
-            text: 'Atmosphere connected using ' + response.transport
-        }));
-        input.removeAttr('disabled').focus();
-        status.text('Choose name:');
+        onOpen: function onOpen(response) {
+            if (response && response.request && response.request.uuid) {
+                console.debug('Connected with uuid', response.request.uuid);
+                request.uuid = response.request.uuid;
+            }
+        },
 
-        // Carry the UUID. This is required if you want to call
-        // subscribe(request) again.
-        // request.uuid = response.request.uuid;
-    };
-
-    request.onClientTimeout = function (r) {
-        content
-            .html($(
-                '<p>',
-                {
-                    text: 'Client closed the connection after a timeout. Reconnecting in '
-                    + request.reconnectInterval
-                }));
-        socket
-            .push(atmosphere.util
-                .stringifyJSON({
-                    author: author,
-                    message: 'is inactive and closed the connection. Will reconnect in '
-                    + request.reconnectInterval
-                }));
-        input.attr('disabled', 'disabled');
-        setTimeout(function () {
-            socket = atmosphere.subscribe(request);
-        }, request.reconnectInterval);
+        onClientTimeout: function onClientTimeout(r) {
+            content
+                .html($(
+                    '<p>',
+                    {
+                        text: 'Client closed the connection after a timeout. Reconnecting in '
+                        + request.reconnectInterval
+                    }));
+            socket
+                .push(atmosphere.util
+                    .stringifyJSON({
+                        author: author,
+                        message: 'is inactive and closed the connection. Will reconnect in '
+                        + request.reconnectInterval
+                    }));
+            input.attr('disabled', 'disabled');
+            setTimeout(function () {
+                socket = atmosphere.subscribe(request);
+            }, request.reconnectInterval);
+        }
     };
 
     request.onReopen = function (response) {

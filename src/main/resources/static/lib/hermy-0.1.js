@@ -73,6 +73,7 @@
         this.listeners = [];
         this.targets = [];
         this.name = '';
+        this.request = o.request;
 
         this.init();
     }
@@ -80,8 +81,8 @@
     var p = HermyClient.prototype;
 
     p.init = function init() {
-        // init token
         this.initToken();
+        this.initSocket();
     };
 
     p.initToken = function initToken() {
@@ -108,6 +109,77 @@
         createCookie(this.cookieName, this.token, 365);
     };
 
+    p.initSocket = function () {
+        var _this = this;
+        var request = $.extend({
+            url: this.socketUrl + '/' + this.token,
+            // enableProtocol:false,
+            contentType: "application/json",
+            logLevel: 'debug',
+            transport: 'websocket', // fallback to long-polling by default
+            trackMessageLength: true,
+            reconnectInterval: 500,
+
+            onOpen: function onOpen(response) {
+                if (response && response.request && response.request.uuid) {
+                    log.debug('Hermy connected with id', response.request.uuid);
+                    request.uuid = response.request.uuid;
+                }
+            },
+
+            onClientTimeout: function onClientTimeout(r) {
+                atmosphere.util.debug('Client closed the connection after a timeout. Reconnecting in ' + request.reconnectInterval);
+                // setTimeout(function () {
+                //     this.socket = atmosphere.subscribe(request);
+                // }, request.reconnectInterval);
+            },
+
+            onReopen: function onReopen(response) {
+                atmosphere.util.debug('onReopen ', response.transport);
+            },
+
+            onTransportFailure: function onTransportFailure(errorMsg, request) {
+                atmosphere.util.debug('onTransportFailure', errorMsg, request);
+                // request.fallbackTransport = "long-polling";
+            },
+
+            onMessage: function onMessage(response) {
+                var message = response.responseBody;
+                try {
+                    var msgDef = atmosphere.util.parseJSON(message);
+                } catch (e) {
+                    atmosphere.util.debug('This doesn\'t look like a valid JSON: ', message);
+                    return;
+                }
+
+                atmosphere.util.debug('onMessage', msgDef);
+
+                // fire received message
+                msgDef.$from = msgDef.$from || _this.name;
+                msgDef.$to = msgDef.$to || _this.name;
+                _this.fire(msgDef);
+
+                // if (msgDef.message == '$connected') {
+                //     request.onOpen({})
+                // }
+            },
+
+            onClose: function onClose(response) {
+                atmosphere.util.debug('onClose', response);
+            },
+
+            onError: function onError(response) {
+                atmosphere.util.debug('onError', response);
+            },
+
+            onReconnect: function onReconnect(request, response) {
+                atmosphere.util.debug('onReconnect', request, response);
+            }
+        }, this.request);
+
+        this.socket = atmosphere.subscribe(request);
+    };
+
     p.channel = function channel(name) {
         this.name = name;
         return this;
@@ -116,6 +188,21 @@
     p.with = function (target) {
         this.targets.push(target);
         return this;
+    };
+
+    p.fire = function fire(metadata) {
+        var from = metadata.$from;
+        var body = metadata.$body;
+        var type = metadata.$type;
+        var name = this.name;
+        $.each(this.listeners, function () {
+            if (from == name || (this.source && this.source != from) || (this.type && this.type != type)) {
+                atmosphere.util.debug('ignoring message', metadata);
+
+            } else {
+                this.cb(body, metadata);
+            }
+        });
     };
 
     p.on = function on(messageType, source, callback) {
@@ -178,8 +265,34 @@
         return this;
     };
 
-    p.send = function send() {
+    p.send = function send(messageType, messageData) {
+        var msgDef;
+        if (messageType && messageData) {
+            // send(messageType, messageData)
+            msgDef = {
+                $type: messageType,
+                $body: messageData
+            };
+        } else if (typeof messageType == 'string') {
+            // send(messageType)
+            msgDef = {
+                $type: messageType
+            };
+        } else {
+            // send(messageObject|messageDefinition)
+            msgDef = {
+                $body: messageType
+            };
+        }
 
+        // copy messageDefinition from message, or use defaults if message contains no metadata
+        var body = msgDef.$body;
+        msgDef.$type = msgDef.$type || body.$type || 'message';
+        msgDef.$from = body.$from || this.name;
+        msgDef.$to = body.$to || this.targets;
+
+        // push message
+        this.socket.push(atmosphere.util.stringifyJSON(msgDef));
     };
 
     p.withHermyQueryParam = function withHermyQueryParam(url) {

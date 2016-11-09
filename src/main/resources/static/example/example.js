@@ -6,7 +6,8 @@ var hermyClient = new HermyClient({
     transport: 'http',                  // optional. 'applet','flash' or 'http'. default: 'http'
     socketUrl: '/hermy/socket',         // Hermy Websocket URL (when using HTTP transport). Uses Atmosphere server. default: '/hermy/socket'
     cookieName: 'hermyToken',           // Cookie name for storing token. default: 'hermyToken'
-    tokenSeed: 'username'               // it's recommended to create hermy with a unique token seed per user
+    tokenSeed: 'username',              // it's recommended to create hermy with a unique token seed per user
+    request: {}                         // optional, for advanced users. atmosphere request configuration
 });
 
 // or you can pass just a token seed
@@ -31,7 +32,7 @@ channel | hermyClient
     .on(messageType, callbackFunction)  // listen to messages of a given type (from any source)
     .on(callbackFunction)  // listen to all messages
 
-    // a 'connect' event is received when Hermy connects to server
+    // a '$connected' event is received when Hermy connects to server
     .on('connect', function (user, metadata) {
         console.info('Got message from ' + metadata.$from);
         console.info('Showing user #' + user.id);
