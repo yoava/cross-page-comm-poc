@@ -96,7 +96,7 @@
 
         // get token from cookie
         var cookie = readCookie(this.cookieName);
-        if (!cookie) {
+        if (cookie) {
             this.token = cookie;
             return;
         }
