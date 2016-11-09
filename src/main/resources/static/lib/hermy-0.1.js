@@ -146,7 +146,7 @@
             onMessage: function onMessage(response) {
                 var message = response.responseBody;
                 try {
-                    var msgDef = atmosphere.util.parseJSON(message);
+                    var msgDef = atmosphere.util.parseJSON(unescape(message));
                 } catch (e) {
                     atmosphere.util.debug('This doesn\'t look like a valid JSON: ', message);
                     return;
@@ -292,7 +292,7 @@
         msgDef.$to = body.$to || this.targets;
 
         // push message
-        this.socket.push(atmosphere.util.stringifyJSON(msgDef));
+        this.socket.push(escape(atmosphere.util.stringifyJSON(msgDef)));
     };
 
     p.withHermyQueryParam = function withHermyQueryParam(url) {

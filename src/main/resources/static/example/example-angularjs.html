@@ -23,7 +23,6 @@
                     // update model when user changes from legacy app
                             .on('userChanged', function (user) {
                                 $scope.user = user;
-                                window.focus();
                                 $scope.$apply();
                             })
 
@@ -33,7 +32,6 @@
 
                     $scope.editUserInLegacyApp = function () {
                         channel.send('editUser', $scope.user);
-                        window.open('javascript:;', 'legacy');
                     };
 
                     function logMessage(message, metadata) {
