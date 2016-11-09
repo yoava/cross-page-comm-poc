@@ -39,6 +39,7 @@
                     function logMessage(message, metadata) {
                         console.info('Got message', message, metadata);
                         $scope.log.push({body: message, metadata: metadata});
+                        $scope.$apply();
                     }
                 });
 
