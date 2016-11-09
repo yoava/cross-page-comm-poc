@@ -113,7 +113,7 @@
         var _this = this;
         var request = $.extend({
             url: this.socketUrl + '/' + this.token,
-            // enableProtocol:false,
+            enableProtocol: false,
             contentType: "application/json",
             logLevel: 'debug',
             transport: 'websocket', // fallback to long-polling by default
@@ -140,7 +140,7 @@
 
             onTransportFailure: function onTransportFailure(errorMsg, request) {
                 atmosphere.util.debug('onTransportFailure', errorMsg, request);
-                // request.fallbackTransport = "long-polling";
+                request.fallbackTransport = "long-polling";
             },
 
             onMessage: function onMessage(response) {
@@ -185,7 +185,7 @@
         return this;
     };
 
-    p.with = function (target) {
+    p.target = function (target) {
         this.targets.push(target);
         return this;
     };

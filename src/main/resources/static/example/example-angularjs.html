@@ -17,7 +17,7 @@
 
                     var channel = new HermyClient('yoava')   // use default config and 'yoava' as a tokenSeed
                             .channel('angularjs')            // get messages send to 'angularjs'
-                            .with('legacy');                 // send messages to 'legacy'
+                            .target('legacy');                 // send messages to 'legacy'
 
                     channel
                     // update model when user changes from legacy app

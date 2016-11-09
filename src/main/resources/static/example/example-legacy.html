@@ -13,7 +13,7 @@
             // create HermyClient
             var channel = new HermyClient('yoava')   // use default config and 'yoava' as a tokenSeed
                     .channel('legacy')               // get messages send to 'legacy'
-                    .with('angularjs');              // send messages to 'angularjs'
+                    .target('angularjs');              // send messages to 'angularjs'
 
             channel
             // show Edit User dialog when receiving 'editUser' message

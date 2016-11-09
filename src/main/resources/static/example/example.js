@@ -21,8 +21,8 @@ var hermyClient = new HermyClient(tokenSeed);
 // create channel
 var channel = hermyClient
     .channel(senderName)    // this is the sender name. (e.g. channel('ie7') )
-    .with(targetName)       // add a target channel (e.g. with('angular-app')
-    .with(target2);
+    .target(targetName)       // add a target channel (e.g. with('angular-app')
+    .target(target2);
 
 
 // listen to incoming messages
