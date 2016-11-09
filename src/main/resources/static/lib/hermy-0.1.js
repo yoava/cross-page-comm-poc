@@ -122,7 +122,7 @@
 
             onOpen: function onOpen(response) {
                 if (response && response.request && response.request.uuid) {
-                    log.debug('Hermy connected with id', response.request.uuid);
+                    atmosphere.util.debug('Hermy connected with id', response.request.uuid);
                     request.uuid = response.request.uuid;
                 }
             },
@@ -153,6 +153,10 @@
                 }
 
                 atmosphere.util.debug('onMessage', msgDef);
+
+                if (msgDef.$from == _this.name || (msgDef.$to && msgDef.$to != _this.name)) {
+                    return
+                }
 
                 // fire received message
                 msgDef.$from = msgDef.$from || _this.name;
@@ -196,10 +200,7 @@
         var type = metadata.$type;
         var name = this.name;
         $.each(this.listeners, function () {
-            if (from == name || (this.source && this.source != from) || (this.type && this.type != type)) {
-                atmosphere.util.debug('ignoring message', metadata);
-
-            } else {
+            if (!this.type || this.type == type) {
                 this.cb(body, metadata);
             }
         });
@@ -286,12 +287,12 @@
         }
 
         // copy messageDefinition from message, or use defaults if message contains no metadata
-        var body = msgDef.$body;
+        var body = msgDef.$body || {};
         msgDef.$type = msgDef.$type || body.$type || 'message';
         msgDef.$from = body.$from || this.name;
         msgDef.$to = body.$to || this.targets;
 
-        // push message
+        // push message (we use escape for backwards compatibility)
         this.socket.push(escape(atmosphere.util.stringifyJSON(msgDef)));
     };
 

@@ -11,6 +11,9 @@
         $(function () {
             // fix all <a> links on this page
             new HermyClient('yoava').addAnchorQueryParam('a');
+            $('a').click(function () {
+                window.open(this.href, this.target, 'resizable=1,location=1,scrollbars=1,titlebar=1,toolbar=1,menubar=1,height=' + screen.availHeight + ',width=' + screen.availHeight)
+            })
         });
     </script>
 </head>
@@ -22,7 +25,7 @@
     <a href="./example-legacy.html" target="legacy">Legacy App: Open this page in IE7</a>
 </p>
 <p>
-    <a href="./example-angularjs.html" target="angularjs">AngularJS App: Open this page in Chrome</a>
+    <a href="./example-angularjs.html" target="angularjs">AngularJS App: Open this page in a modern browser</a>
 </p>
 
 </body>

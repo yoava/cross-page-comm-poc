@@ -14,29 +14,40 @@
                     // init log
                     $scope.log = [];
                     $scope.user = {id: 1, name: 'Dude'};
+                    $scope.showEditPanel = false;
+                    $scope.edited = false;
 
                     var channel = new HermyClient('yoava')   // use default config and 'yoava' as a tokenSeed
                             .channel('angularjs')            // get messages send to 'angularjs'
                             .target('legacy');                 // send messages to 'legacy'
 
-                    channel
+                    // log all messages
+                    channel.on(logMessage)
+
                     // update model when user changes from legacy app
-                            .on('userChanged', function (user) {
-                                $scope.user = user;
+                            .on('editUser', function () {
+                                $scope.showEditPanel = true;
                                 $scope.$apply();
                             })
 
-                            // log all messages
-                            .on(logMessage)
-                            .on('$connected', 'angularjs', logMessage);
+                            // update model when user changes from legacy app
+                            .on('userChanged', function (user) {
+                                $scope.user = user;
+                                $scope.edited = true;
+                                $scope.showEditPanel = true;
+                                $scope.$apply();
+                            });
 
                     $scope.editUserInLegacyApp = function () {
                         channel.send('editUser', $scope.user);
+                        $scope.showEditPanel = false;
+                        $scope.edited = true;
+                        window.open('', 'legacy');
                     };
 
                     function logMessage(message, metadata) {
                         console.info('Got message', message, metadata);
-                        $scope.log.push({body: message, metadata: metadata});
+                        $scope.log.push($.extend({}, {body: message, metadata: metadata}));
                         $scope.$apply();
                     }
                 });
@@ -48,12 +59,21 @@
 <h1>AngularJS App</h1>
 
 <div ng-controller="ExampleController">
+    <div ng-hide="showEditPanel">
+        <div>Click [Edit User] here or in legacy app to edit user</div>
+        <button ng-click="showEditPanel=true;edited=false;">Edit User</button>
+    </div>
 
-    <div class="editUser">
-        <h3>Edit User in Legacy App</h3>
+    <p class="message" ng-hide="showEditPanel || !edited"><strong>Now go and edit user in legacy app...</strong></p>
+
+    <div class="editUser" ng-if="showEditPanel">
+        <h3>Edit User</h3>
         <div><label for="userId">Id:</label><input id="userId" type="text" ng-model="user.id"></div>
         <div><label for="username">Username:</label><input id="username" type="text" ng-model="user.name"></div>
-        <button ng-click="editUserInLegacyApp()">Edit in legacy app</button>
+        <div><label for="username">Email:</label><input id="email" type="text" readonly ng-model="user.email"></div>
+        <div class="message" ng-if="edited">User was edited by AngularJS app!</div>
+        <div>Click [Next >>] to edit user in legacy app</div>
+        <button ng-click="editUserInLegacyApp()">Next >></button>
     </div>
 
     <h3 class="title">Hermy Log:</h3>

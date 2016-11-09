@@ -47,3 +47,14 @@ button {
 .value {
     padding: 5px;
 }
+
+input[readonly] {
+    border: none;
+}
+
+.message {
+    margin: 20px 0;
+    background: lightgreen;
+    font-weight: bold;
+    padding: 3px 6px;
+}
