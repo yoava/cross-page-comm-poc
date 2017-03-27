@@ -4,7 +4,7 @@
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         define(['jquery', 'atmosphere'], factory);
-    } else if (typeof exports === 'obj¬ect') {
+    } else if (typeof exports === 'object') {
         // Node, CommonJS-like
         module.exports = factory(require('jquery'), require('atmosphere'));
     } else {
@@ -16,12 +16,15 @@
 }(this, function ($, atmosphere) {
     // utils
     function createCookie(name, value, days) {
+        var expires;
         if (days) {
             var date = new Date();
             date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-            var expires = "; expires=" + date.toGMTString();
+            expires = "; expires=" + date.toGMTString();
         }
-        else var expires = "";
+        else {
+            expires = "";
+        }
         document.cookie = name + "=" + value + expires + "; path=/";
     }
 
@@ -30,8 +33,8 @@
         var ca = document.cookie.split(';');
         for (var i = 0; i < ca.length; i++) {
             var c = ca[i];
-            while (c.charAt(0) == ' ') c = c.substring(1, c.length);
-            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+            while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
         }
         return null;
     }
@@ -40,9 +43,9 @@
         var newParam = key + "=" + value;
         var result = url.replace(new RegExp("(&|\\?)" + key + "=[^\&|#]*"), '$1' + newParam);
         if (result === url) {
-            result = (url.indexOf("?") != -1 ? url.split("?")[0] + "?" + newParam + "&" + url.split("?")[1]
-                : (url.indexOf("#") != -1 ? url.split("#")[0] + "?" + newParam + "#" + url.split("#")[1]
-                : url + '?' + newParam));
+            result = (url.indexOf("?") !== -1 ? url.split("?")[0] + "?" + newParam + "&" + url.split("?")[1]
+                : (url.indexOf("#") !== -1 ? url.split("#")[0] + "?" + newParam + "#" + url.split("#")[1]
+                    : url + '?' + newParam));
         }
         return result;
     }
@@ -55,12 +58,12 @@
      */
     function HermyClient(options) {
         var o = options;
-        if (typeof o == 'string') {
+        if (typeof o === 'string') {
             // got just tokenSeed
             this.tokenSeed = o;
         } else {
             // got options object
-            if (o.transport && o.transport != 'http') {
+            if (o.transport && o.transport !== 'http') {
                 throw new Error('transport "' + o.transport + '" is not supported yet');
             }
         }
@@ -154,7 +157,7 @@
 
                 atmosphere.util.debug('onMessage', msgDef);
 
-                if (msgDef.$from == _this.name || (msgDef.$to && msgDef.$to != _this.name)) {
+                if (msgDef.$from === _this.name || (msgDef.$to && msgDef.$to !== _this.name)) {
                     return
                 }
 
@@ -200,7 +203,7 @@
         var type = metadata.$type;
         var name = this.name;
         $.each(this.listeners, function () {
-            if (!this.type || this.type == type) {
+            if (!this.type || this.type === type) {
                 this.cb(body, metadata);
             }
         });
@@ -222,13 +225,13 @@
         }
 
         // validate
-        if (typeof callback != 'function') {
+        if (typeof callback !== 'function') {
             throw new Error('Illegal argument, callback is not a function')
         }
 
         // add listener
         var listeners = this.listeners;
-        if (typeof source == 'string' || !source || !source.length) {
+        if (typeof source === 'string' || !source || !source.length) {
             listeners.push({type: messageType, source: source, cb: callback});
         } else {
             $.each(source, function () {
@@ -243,18 +246,18 @@
         if (messageType && callbackFunction) {
             // off(messageType, callbackFunction)
             selector = function (listener) {
-                return listener.cb != callbackFunction && listener.type != messageType;
+                return listener.cb !== callbackFunction && listener.type !== messageType;
             };
 
-        } else if (typeof messageType == 'string') {
+        } else if (typeof messageType === 'string') {
             // off(messageType)
             selector = function (listener) {
-                return listener.type != messageType;
+                return listener.type !== messageType;
             };
-        } else if (typeof messageType == 'function') {
+        } else if (typeof messageType === 'function') {
             // off(callbackFunction)
             selector = function (listener) {
-                return listener.cb != messageType;
+                return listener.cb !== messageType;
             };
 
         } else {
@@ -274,7 +277,7 @@
                 $type: messageType,
                 $body: messageData
             };
-        } else if (typeof messageType == 'string') {
+        } else if (typeof messageType === 'string') {
             // send(messageType)
             msgDef = {
                 $type: messageType
